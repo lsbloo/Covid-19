@@ -6,7 +6,7 @@ figlet=$(which figlet)
 if [ -z $figlet ]; then
     sudo apt-get install -y figlet
 fi
-figlet Welcome to DistanceMatrix by: Lsbloo
+figlet Welcome to COVID-19 GENERATOR_API by: Lsbloo
 
 echo ' '
 echo '
