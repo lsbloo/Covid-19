@@ -12,3 +12,8 @@ class Covid(object):
         self.number_cases=number_cases
         self.status_cases_type=status_cases_type
     
+    def toString(self):
+        print("Province State:" , self.province_state,  "Country Region:",  self.country_region)
+        print("Latitude:" , self.latitude, " Longitude: " , self.longitude)
+        
+    

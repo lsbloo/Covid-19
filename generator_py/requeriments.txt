@@ -1,4 +1,4 @@
-psycopg2==2.7.7
+psycopg2==2.8.4
 psycopg2-binary==2.8.4
 virtualenv==16.0.0
-
+pymongo==3.10.1

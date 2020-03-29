@@ -12,3 +12,9 @@ DATABASE_PORT = os.environ.get('DATABASE_PORT', 'Not Set Port Database')
 PATH_CSV = os.environ.get('PATH_CSV', 'NOT SET PATH CSV')
 NAME_ARCHIVE_CSV = os.environ.get('NAME_CSV', 'NOT SET NAME ARCHIVE CSV')
 
+
+
+#### MONGO DB URL CONFIG
+URL_MONGO_DB = os.environ.get('URL_MONGO_DB', 'NOT SET URL MONGODB')
+
+

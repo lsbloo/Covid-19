@@ -22,8 +22,12 @@ class Database(object):
         user=self.database_user,password=self.database_password,port=self.database_port)
 
         self.instance.autocommit=True
+
         if self.instance != None:
+    
             return self.instance
+
+        
         return None
     
 class OperatorDatabase(object):

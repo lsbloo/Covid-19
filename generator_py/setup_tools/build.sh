@@ -6,7 +6,7 @@ figlet=$(which figlet)
 if [ -z $figlet ]; then
     sudo apt-get install -y figlet
 fi
-figlet Welcome to DistanceMatrix by: Lsbloo
+figlet Welcome to COVID-19 GENERATOR_API by: Lsbloo
 
 echo ' '
 echo '
@@ -41,7 +41,8 @@ function export_variables(){
 	read -p "DATABASE PASSWORD: " DATABASE_PASSWORD
 	read -p "DATABASE PORT: " DATABASE_PORT
 	read -p "PATH_CSV: " PATH_CSV
-    	read -p "NAME_CSV: "   NAME_CSV
+    read -p "NAME_CSV: "   NAME_CSV
+    read -p "URL_MONGO_DB: " URL_MONGO_DB 
 
 	if [ -z $DATABASE_NAME ]; then
 		echo "Preencha o nome do banco de dados corretamente."
@@ -61,16 +62,21 @@ function export_variables(){
 	if [ -z $PATH_CSV ]; then
 		echo 'Preencha o Path para armazenar os arquivos gerados corretamente'
 	fi
-    	if [ -z $NAME_CSV ]; then
+    if [ -z $NAME_CSV ]; then
         	echo 'Preencha o nome do arquivo .csv corretamente; '
-    	fi
+    fi
+	if [ -z $URL_MONGO_DB ]; then
+		echo 'Preencha a url de conexao do cluster Mongo Db corretamente.'
+	fi
+
 	export DATABASE_NAME=$DATABASE_NAME
 	export DATABASE_HOST=$DATABASE_HOST
 	export DATABASE_USER=$DATABASE_USER
 	export DATABASE_PASSWORD=$DATABASE_PASSWORD
 	export DATABASE_PORT=$DATABASE_PORT
 	export PATH_CSV=$PATH_CSV
-        export NAME_CSV=$NAME_CSV
+    export NAME_CSV=$NAME_CSV
+	export URL_MONGO_DB=$URL_MONGO_DB
 
 }
 
