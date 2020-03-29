@@ -1,15 +1,21 @@
 from csv_import.csv import ReaderCSV
+from csv_import.csv import Generator
 from database.covid19db import Database
 from database.covid19db import OperatorDatabase
 from database.covid19dbm import DatabaseM
 from database.covid19dbm import OperatorDatabaseM
+from plot.plotter import Pandas
 from models.model import Covid
 from models.model import Metric
 from generator_arch.manipulatorfile import ManipulatorFile
+import matplotlib.pyplot as plt
+import numpy as np
+
 import os
 import time
 import timeit
 import sys
+
 
 def check_arch():
     sub = os.environ.get('HOME')
@@ -43,6 +49,16 @@ def conversor(seconds):
     return minutos
 
 
+def get_all_metrics_collected():
+    db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
+    operador_db = OperatorDatabase(db)
+    result_collects = operador_db.get_all_metrics()
+    if result_collects != None:
+        generator = Generator(os.environ.get('HOME'))
+        generator.gerenate('metrics.csv',result_collects)
+        return result_collects
+    return None
+
 
 def drop_table_psql_schemas01():
     try:
@@ -64,6 +80,8 @@ def recovery_data_psql():
 
     except Exception as e:
         print('Error Recovery data set psql', e)
+
+
 def insert_data_psql(result_data_set,quantity_data_insert):
     try:
         if result_data_set != None:
@@ -110,6 +128,7 @@ def recovery_data_mongo_one_one():
         names_collection =  operador_db.list_collections()
         q = operador_db.get_collection_hash(manipulator.reader_file())
         print("Size: Recovery Data Mongo DB:" , len(q))
+        return q
 
         
     
@@ -140,7 +159,6 @@ def time_insert_data(init,fi):
 def insert_metrics(metric):
     db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
     operador_db = OperatorDatabase(db)
-
     inserted = operador_db.insert_metrics(metric)
     return inserted
 
@@ -149,6 +167,37 @@ def insert_metrics(metric):
 args = []
 for parameter in sys.argv[1:]:
     args.append(parameter)
+
+if args[0] == 'collect':
+    print('collect size', len(get_all_metrics_collected()))
+
+if args[0] == 'plot':
+    mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
+    print(mPandas.header(Generator.get_len_type_csv(os.environ.get('HOME'),'metrics.csv')))
+
+    #mPandas.create_file('metrics.csv')
+    plt.rcdefaults()
+    fig,ax = plt.subplots()
+
+    sgbds = ('PSQL', 'MongoDB')
+    y_pos = np.arange(len(sgbds))
+    performance = 3 + 10 * np.random.rand(len(sgbds))
+    error = np.random.rand(len(sgbds))
+
+    
+    ax.barh(y_pos, performance, xerr=error, align='center')
+    ax.set_yticks(y_pos)
+
+    ax.set_yticklabels(sgbds)
+    
+    ax.invert_yaxis()  # labels read top-to-bottom
+    ax.set_xlabel('Tempo de inserção')
+    ax.set_title('Desempenho PSQL X MONGODB')
+
+    plt.show()
+
+
+
 
 if args[0] == 'psql':
     if args[1] == 'insert':
@@ -165,10 +214,13 @@ if args[0] == 'psql':
 
 if args[0] == "psql":
     if args[1] == 'recovery':
-        time_cal_mongo_init = timeit.default_timer()
-        recovery_data_psql()
-        time_cal_mongo_fim = timeit.default_timer()
-        time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+        time_cal_psql_init = timeit.default_timer()
+        re = recovery_data_psql()
+        time_cal_psql_fim = timeit.default_timer()
+        metrics_time = time_insert_data(time_cal_psql_init,time_cal_psql_fim)
+        obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],len(re))
+        result = insert_metrics(obj_m)
+        print('Metric Insertd: ', result)
     
     if args[1] == 'drop':
         re = drop_table_psql_schemas01()
@@ -183,17 +235,28 @@ if args[0] == 'mongo':
             time_cal_mongo_init = timeit.default_timer()
             insert_data_mongo(result_data_set,int(args[2]))
             time_cal_mongo_fim = timeit.default_timer()
-            time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+            metrics_time = time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+            obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],args[2])
+            result = insert_metrics(obj_m)
+
     elif args[1] == 'recovery-all-fast':
         time_cal_mongo_init = timeit.default_timer()
-        recovery_data_mongo()
+        q = recovery_data_mongo()
         time_cal_mongo_fim = timeit.default_timer()
         time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+        metrics_time = time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+        obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],len(q))
+        result = insert_metrics(obj_m)
+
     elif args[1] == 'recovery':
         time_cal_mongo_init = timeit.default_timer()
-        recovery_data_mongo_one_one()
+        q = recovery_data_mongo_one_one()
         time_cal_mongo_fim = timeit.default_timer()
         time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+        metrics_time = time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+        obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],len(q))
+        result = insert_metrics(obj_m)
+
     elif args[1] == 'drop':
         print("Drop Collection: ", drop_collection_mong())
 

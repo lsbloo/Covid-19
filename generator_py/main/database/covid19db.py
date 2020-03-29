@@ -60,10 +60,11 @@ class OperatorDatabase(object):
 
     def validate_insert_metrics(self,metric):
         cursor = self.database.get_instance().cursor()
+    
         sql_ = "SELECT * FROM metrics_generator where operation='%s' and sgbd_name='%s' and quantity_lines='%s'"%(metric.operation,metric.sgbd_name,metric.quantity_lines)
         cursor.execute(sql_)
         q= []
-        result =[]
+        result = []
         for i in cursor.fetchall():
             q.append(i)
 
@@ -92,15 +93,23 @@ class OperatorDatabase(object):
             # update metrics
             cursor = self.database.get_instance().cursor()
             data= [metric.sgbd_name, metric.operation, metric.time_duration_seconds, metric.time_duration_min,metric.quantity_lines]
-            sql_update_query_insert = "update metrics_generator set time_duration_seconds=%s,time_duration_min=%s,quantity_lines=%s"
-            cursor.execute(sql_update_query_insert,(metric.time_duration_seconds,metric.time_duration_min,metric.quantity_lines))
+            sql_update_query_insert = "update metrics_generator set time_duration_seconds=%s,time_duration_min=%s,quantity_lines=%s where id=%s"
+            cursor.execute(sql_update_query_insert,(metric.time_duration_seconds,metric.time_duration_min,metric.quantity_lines, q[0][1]))
             cursor.close()
             return True
 
         return False
 
-
-        
+    def get_all_metrics(self):
+        cursor = self.database.get_instance().cursor()
+        sql_ = ('SELECT * FROM metrics_generator')
+        cursor.execute(sql_)
+        resul = []
+        for i in cursor.fetchall():
+            resul.append(i)
+        if len(resul) >= 1:
+            return resul
+        return None
     
     def get_all(self):
         cursor = self.database.get_instance().cursor()
