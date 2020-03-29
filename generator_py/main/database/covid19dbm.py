@@ -1,4 +1,5 @@
 import pymongo
+from bson.objectid import ObjectId
 
 
 ## Define o object database mongo db
@@ -53,6 +54,15 @@ class OperatorDatabaseM(object):
         
 
         return id_
+
+    def get_collection_hash(self,lista):
+        q=[]
+        for hash_object in lista:
+            obj = self.db.get_instance_collection().find_one({"_id": ObjectId(hash_object)})
+            q.append(obj)
+        
+        return q
+    
 
     def get_collection(self,q):
         collection = self.db.get_instance_collection().find({})

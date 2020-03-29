@@ -10,8 +10,16 @@ import time
 import timeit
 import sys
 
+def check_arch():
+    sub = os.environ.get('HOME')
+    sub += "/"
+    sub += 'objects_mongo.txt'
+    if os.path.exists(sub):
+        pass
+    else:
+        ManipulatorFile.create_file('objects_mongo.txt')
+check_arch()
 
-ManipulatorFile.create_file('objects_mongo.txt')
 
 def get_data_csv():
     try:
@@ -61,6 +69,19 @@ def recovery_data_mongo():
         print("Size: Recovery Data Mongo DB: "  , len(s))
         return s
 
+
+def recovery_data_mongo_one_one():
+    db = DatabaseM(os.environ.get('URL_MONGO_DB'))
+    operador_db = OperatorDatabaseM(db,'covid19')
+    manipulator = ManipulatorFile('objects_mongo.txt')
+
+    if db.get_instance() != None:
+        names_collection =  operador_db.list_collections()
+        q = operador_db.get_collection_hash(manipulator.reader_file())
+        print("Size: Recovery Data Mongo DB:" , len(q))
+        
+        
+    
 def insert_data_mongo(result_data_set,quantity_data_insert):
     try:
         if result_data_set != None:
@@ -115,6 +136,12 @@ if args[0] == 'mongo':
         recovery_data_mongo()
         time_cal_mongo_fim = timeit.default_timer()
         time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+    elif args[1] == 'recovery':
+        time_cal_mongo_init = timeit.default_timer()
+        recovery_data_mongo_one_one()
+        time_cal_mongo_fim = timeit.default_timer()
+        time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+        
 
 
 

@@ -30,9 +30,11 @@ class ManipulatorFile(object):
         sub = os.environ.get('HOME')
         sub+="/"
         sub += self.name
+        
         arch = open(sub,'r')
         ids = []
         for linha in arch:
+            
             linha = linha.rstrip()
             ids.append(linha)
         arch.close()
