@@ -3,17 +3,15 @@ from database.covid19db import Database
 from database.covid19db import OperatorDatabase
 from database.covid19dbm import DatabaseM
 from database.covid19dbm import OperatorDatabaseM
-
-
 from models.model import Covid
-
+from generator_arch.manipulatorfile import ManipulatorFile
 import os
 import time
 import timeit
 import sys
 
 
-
+ManipulatorFile.create_file('objects_mongo.txt')
 
 def get_data_csv():
     try:
@@ -57,18 +55,25 @@ def recovery_data_mongo():
     operador_db = OperatorDatabaseM(db,'covid19')
     if db.get_instance() != None:
         names_collection =  operador_db.list_collections()
-        return operador_db.get_collection(names_collection[0])
+        s =[]
+        for i in operador_db.get_collection(names_collection[0]):
+            s.append(i)
+        print("Size: Recovery Data Mongo DB: "  , len(s))
+        return s
 
 def insert_data_mongo(result_data_set,quantity_data_insert):
     try:
         if result_data_set != None:
+            manipulator = ManipulatorFile('objects_mongo.txt')
             db = DatabaseM(os.environ.get('URL_MONGO_DB'))
             operador_db = OperatorDatabaseM(db,'covid19')
             if db.get_instance_collection() != None:
                 print("SIZE RECOVERY DATASET:" ,  len(result_data_set[0][0].attendant_csv(result_data_set[0][1])))
                 recovery_data_set = result_data_set[0][0].attendant_csv(result_data_set[0][1])
                 for i in range(quantity_data_insert):
-                    operador_db.insert(recovery_data_set[i])
+                    obj = operador_db.insert(recovery_data_set[i])
+                    manipulator.write_file(obj)
+
 
     except Exception as e:
         print('error inserting dataset in mongodb', e)
@@ -105,7 +110,7 @@ if args[0] == 'mongo':
             insert_data_mongo(result_data_set,int(args[2]))
             time_cal_mongo_fim = timeit.default_timer()
             time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
-    elif args[1] == 'recovery':
+    elif args[1] == 'recovery-all-fast':
         time_cal_mongo_init = timeit.default_timer()
         recovery_data_mongo()
         time_cal_mongo_fim = timeit.default_timer()

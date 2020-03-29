@@ -50,7 +50,7 @@ class OperatorDatabaseM(object):
             "collection_name: ": self.collection_name
         }
         id_ = self.db.get_instance_collection().insert_one(post_insert).inserted_id
-        print(id_)
+        
 
         return id_
 
