@@ -4,6 +4,7 @@ from database.covid19db import OperatorDatabase
 from database.covid19dbm import DatabaseM
 from database.covid19dbm import OperatorDatabaseM
 from models.model import Covid
+from models.model import Metric
 from generator_arch.manipulatorfile import ManipulatorFile
 import os
 import time
@@ -38,10 +39,31 @@ def get_data_csv():
 def choose_quantity_insert_psql(quantity_inserts):
     pass
 def conversor(seconds):
-    minutos = 'minutos: %f' %(seconds/60) 
+    minutos = seconds/60 
     return minutos
 
 
+
+def drop_table_psql_schemas01():
+    try:
+        db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
+        operador_db = OperatorDatabase(db)
+        operador_db.drop_table_schemas_01()
+        return True
+
+    except Exception as e:
+        print('Error drop table psql schemas-01', e)
+        return False
+def recovery_data_psql():
+    try:
+        db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
+        operador_db = OperatorDatabase(db)
+        re = operador_db.get_all()
+        print('Size Recovery dataset psql', len(re))
+        return re
+
+    except Exception as e:
+        print('Error Recovery data set psql', e)
 def insert_data_psql(result_data_set,quantity_data_insert):
     try:
         if result_data_set != None:
@@ -57,6 +79,15 @@ def insert_data_psql(result_data_set,quantity_data_insert):
                 
     except Exception as e:
         print('error inserting dataset in psql', e)
+
+def drop_collection_mong():
+    db = DatabaseM(os.environ.get('URL_MONGO_DB'))
+    operador_db = OperatorDatabaseM(db,'covid19')
+    if db.get_instance()!=None:
+        operador_db.drop_collection()
+        return True
+    return False
+
 
 def recovery_data_mongo():
     db = DatabaseM(os.environ.get('URL_MONGO_DB'))
@@ -79,7 +110,7 @@ def recovery_data_mongo_one_one():
         names_collection =  operador_db.list_collections()
         q = operador_db.get_collection_hash(manipulator.reader_file())
         print("Size: Recovery Data Mongo DB:" , len(q))
-        
+
         
     
 def insert_data_mongo(result_data_set,quantity_data_insert):
@@ -102,7 +133,17 @@ def insert_data_mongo(result_data_set,quantity_data_insert):
 def time_insert_data(init,fi):
     s = fi - init
     print('duração em segundos : %f' % (s))
-    print('duração em  ' , conversor(s))
+    print('duração em minutos: ' , conversor(s))
+    return [s,conversor(s)]
+
+
+def insert_metrics(metric):
+    db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
+    operador_db = OperatorDatabase(db)
+
+    inserted = operador_db.insert_metrics(metric)
+    return inserted
+
 
 
 args = []
@@ -116,12 +157,24 @@ if args[0] == 'psql':
             time_cal_psql_init = timeit.default_timer()
             insert_data_psql(result_data_set,int(args[2]))
             time_cal_psql_fim = timeit.default_timer()
-            time_insert_data(time_cal_psql_init,time_cal_psql_fim)
+            metrics_time = time_insert_data(time_cal_psql_init,time_cal_psql_fim)
+            obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],args[2])
+            result = insert_metrics(obj_m)
+            print('Metric Insertd: ', result)
+
 
 if args[0] == "psql":
     if args[1] == 'recovery':
-        pass
+        time_cal_mongo_init = timeit.default_timer()
+        recovery_data_psql()
+        time_cal_mongo_fim = timeit.default_timer()
+        time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+    
+    if args[1] == 'drop':
+        re = drop_table_psql_schemas01()
+        print('Drop Table Schema-1: ', re )
 
+ 
 
 if args[0] == 'mongo':
     if args[1] == 'insert':
@@ -141,6 +194,9 @@ if args[0] == 'mongo':
         recovery_data_mongo_one_one()
         time_cal_mongo_fim = timeit.default_timer()
         time_insert_data(time_cal_mongo_init,time_cal_mongo_fim)
+    elif args[1] == 'drop':
+        print("Drop Collection: ", drop_collection_mong())
+
         
 
 
