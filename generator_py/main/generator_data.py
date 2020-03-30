@@ -71,11 +71,16 @@ def drop_table_psql_schemas01():
     except Exception as e:
         print('Error drop table psql schemas-01', e)
         return False
-def recovery_data_psql():
+def recovery_data_psql(quantity_line):
     try:
         db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
         operador_db = OperatorDatabase(db)
-        re = operador_db.get_all()
+        re = operador_db.get_by_qnt(quantity_line)
+        spliter=[]
+        for k in re:
+            spliter.append(k[0])
+        operador_db.get_by_split(spliter)
+
         print('Size Recovery dataset psql', len(re))
         return re
 
@@ -234,7 +239,7 @@ if args[0] == 'plot':
     elif args[1] == 'recovery':
         q = Generator.get_dataset_recovery_operation(os.environ.get('HOME'),'metrics.csv')
         mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
-        
+
         data_set = q
         times_mb=[]
         times_psql=[]
@@ -287,7 +292,7 @@ if args[0] == 'psql':
 if args[0] == "psql":
     if args[1] == 'recovery':
         time_cal_psql_init = timeit.default_timer()
-        re = recovery_data_psql()
+        re = recovery_data_psql(int(args[2]))
         time_cal_psql_fim = timeit.default_timer()
         metrics_time = time_insert_data(time_cal_psql_init,time_cal_psql_fim)
         obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],len(re))

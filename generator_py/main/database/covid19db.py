@@ -111,16 +111,32 @@ class OperatorDatabase(object):
             return resul
         return None
     
-    def get_all(self):
+    def get_by_qnt(self,qnt):
         cursor = self.database.get_instance().cursor()
         sql_ = ('SELECT * FROM covid19')
         cursor.execute(sql_)
         re = []
+        cont=0
         for i in cursor.fetchall():
+            cont+=1
             re.append(i)
+            if cont == qnt:
+                break
+        
         cursor.close()
 
         return re
+    
+    def get_by_split(self,split):
+        cursor = self.database.get_instance().cursor()
+        q=[]
+        for i in split:
+            sql_ = "SELECT * FROM covid19 where id=%s"%(i)
+            cursor.execute(sql_)
+            for k in cursor.fetchall():
+                q.append(k)
+        
+
     def get_obj_by(self):
         pass
 
