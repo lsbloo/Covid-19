@@ -172,12 +172,22 @@ def quot_insert(times_mb,times_psql,lines_mb,lines_psql):
     }
     return quot
 
+
+def drop_metrics():
+    db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
+    operador_db = OperatorDatabase(db)
+    return operador_db.drop_table_schemas_02()
+
 args = []
 for parameter in sys.argv[1:]:
     args.append(parameter)
 
 if args[0] == 'collect':
     print('collect size', len(get_all_metrics_collected()))
+
+    if args[1] == 'drop':
+        print("Drop Table Schema-2", drop_metrics())
+        
 
 if args[0] == 'plot':
     if args[1] == 'insert':

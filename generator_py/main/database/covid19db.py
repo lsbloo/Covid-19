@@ -130,6 +130,16 @@ class OperatorDatabase(object):
         sql_ = "DROP TABLE %s"%(table_name)
         cursor.execute(sql_)
         cursor.close()
+        return True
+
+    def drop_table_schemas_02(self):
+        cursor = self.database.get_instance().cursor()
+        table_name = tables_name[0].get('schemas-2')
+        sql_ = "DROP TABLE %s" %(table_name)
+        cursor.execute(sql_)
+        cursor.close()
+        return True
+
         
 
 

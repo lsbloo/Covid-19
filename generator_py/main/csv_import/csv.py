@@ -88,7 +88,6 @@ class Generator(object):
             if k[1] == "recovery":
                 q.remove(k)
             elif k[1] == "recovery-all-fast" and k[0] == 'mongo':
-                
                 q.remove(k)
         
         return q
