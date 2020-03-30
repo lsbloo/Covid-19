@@ -41,7 +41,7 @@ For building and running the application you need:
          -> python3 generator_data.py psql or mongo insert (quantity_lines[tables])
   
   * Get Data
-         ->  python3 generator_data.py psql or mongo recovery
+         ->  python3 generator_data.py psql(quantity_lines[tables]) or mongo recovery
   
   * Drop table
          -> python3 generator_data.py psql or mongo drop
