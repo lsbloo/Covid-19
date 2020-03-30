@@ -63,6 +63,10 @@ class OperatorDatabaseM(object):
         
         return q
     
+    def drop_collection(self):
+        collection = self.db.get_instance_collection()
+        collection.drop()
+        
 
     def get_collection(self,q):
         collection = self.db.get_instance_collection().find({})
