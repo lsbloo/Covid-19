@@ -32,7 +32,10 @@ For building and running the application you need:
 - NAME_CSV=coronavirus_dataset.csv
 - URL_MONGO_DB=mongodb://localhost:27017/
 
-**Methods generator_py
+
+
+### How to Run
+ **Methods generator_py
 
   * Insert PSQL/MONGO
          -> python3 generator_data.py psql or mongo insert (quantity_lines[tables])
