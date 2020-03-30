@@ -7,7 +7,6 @@
 - [Requirements](
 - [How to Build]
 - [How to Run]
-- [Authors](#github.com/lsbloo)
 
 ## Getting Started
 
