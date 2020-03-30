@@ -181,7 +181,7 @@ if args[0] == 'collect':
 
 if args[0] == 'plot':
     if args[1] == 'insert':
-        q = Generator.get_dataset(os.environ.get('HOME'),'metrics.csv')
+        q = Generator.get_dataset_insert_operation(os.environ.get('HOME'),'metrics.csv')
         mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
 
         data_set= q[1:]
