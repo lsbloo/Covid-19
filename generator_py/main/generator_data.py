@@ -202,26 +202,25 @@ if args[0] == 'plot':
         df = mPandas.data_frame(quot)
         
         print(df)
+
         time_and_mongo= [quot.get('times')[0],quot.get('lines')[0]]
         time_and_psql = [quot.get('times')[1], quot.get('lines')[1]]
 
-        print(time_and_mongo)
-        print(time_and_psql)
-
-        # Definindo variáveis
-        time_mong_x= time_and_mongo[0]
+        time_mong_x = time_and_mongo[0]
         line_mongo_y = time_and_mongo[1]
         
         time_psql_x = time_and_psql[0]
         line_psql_y = time_and_psql[1]
 
-        
-        
         plt.bar( time_mong_x, line_mongo_y, label = 'MongoDB', color = 'r')
         plt.bar( time_psql_x, line_psql_y , label = 'Postgres-SQL', color = 'b')
         plt.legend()
-        
+        plt.title('Desempenho de Inserção')
+        plt.savefig(os.environ.get('HOME')+"/metric_insert.pdf")
         plt.show()
+    elif args[2] == 'recovery':
+        pass
+
 
 
 if args[0] == 'psql':
