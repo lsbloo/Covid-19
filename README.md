@@ -2,15 +2,15 @@
 
 * Using generator_data.py
 
-Methods generator_py
+    **Methods generator_py
 
-  Insert PSQL
-  python3 generator_data.py psql insert (quantity_lines[tables])
+  * Insert PSQL
+         -> python3 generator_data.py psql insert (quantity_lines[tables])
   
-  Get dataset
-  python3 generator_data.py psql recovery
+  * Get Data
+         ->  python3 generator_data.py psql recovery
   
-  Drop table
-  python3 generator_data.py psql drop
+  * Drop table
+         -> python3 generator_data.py psql drop
   
   
