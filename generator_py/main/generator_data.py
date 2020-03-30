@@ -228,9 +228,47 @@ if args[0] == 'plot':
         plt.title('Desempenho de Inserção')
         plt.savefig(os.environ.get('HOME')+"/metric_insert.pdf")
         plt.show()
-    elif args[2] == 'recovery':
-        pass
 
+    
+
+    elif args[1] == 'recovery':
+        q = Generator.get_dataset_recovery_operation(os.environ.get('HOME'),'metrics.csv')
+        mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
+        
+        data_set = q
+        times_mb=[]
+        times_psql=[]
+        lines_mb =[]
+        lines_psql=[]
+
+        for i in data_set:
+            if i[0] == 'mongo':
+                times_mb.append(i[2])
+                lines_mb.append(i[4])
+            elif i[0] == 'psql':
+                times_psql.append(i[2])
+                lines_psql.append(i[4])
+        
+        quot = quot_insert(times_mb,times_psql,lines_mb,lines_psql)
+        df = mPandas.data_frame(quot)
+        
+        print(df)
+
+        time_and_mongo= [quot.get('times')[0],quot.get('lines')[0]]
+        time_and_psql = [quot.get('times')[1], quot.get('lines')[1]]
+
+        time_mong_x = time_and_mongo[0]
+        line_mongo_y = time_and_mongo[1]
+        
+        time_psql_x = time_and_psql[0]
+        line_psql_y = time_and_psql[1]
+
+        plt.bar( time_mong_x, line_mongo_y, label = 'MongoDB', color = 'r')
+        plt.bar( time_psql_x, line_psql_y , label = 'Postgres-SQL', color = 'b')
+        plt.legend()
+        plt.title('Desempenho de Leitura')
+        plt.savefig(os.environ.get('HOME')+"/metric_recovery.pdf")
+        plt.show()
 
 
 if args[0] == 'psql':

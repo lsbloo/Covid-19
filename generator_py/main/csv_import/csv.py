@@ -77,6 +77,20 @@ class Generator(object):
         pass
     
     @staticmethod
+    def get_dataset_recovery_operation(PATH_CSV,NAME_CSV):
+        arc = PATH_CSV + "/" + NAME_CSV
+        arquivo = open(arc)
+        q=[]
+        for i in csv.reader(arquivo):
+            q.append(i)
+        cont=0
+        re = [] 
+        for k in q[1:]:
+            if k[1]=="recovery":
+                re.append(k)
+        return re
+
+    @staticmethod
     def get_dataset_insert_operation(PATH_CSV, NAME_CSV):
         arc = PATH_CSV + "/" + NAME_CSV
         arquivo = open(arc)
