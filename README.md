@@ -54,3 +54,6 @@ For building and running the application you need:
          -> python3 generator_ata.py plot insert or recovery
     
   
+  ## Performace Graph
+  
+  ![Screenshot](insert_01.png 'Performace Inserção')
