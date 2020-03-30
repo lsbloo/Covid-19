@@ -71,11 +71,16 @@ def drop_table_psql_schemas01():
     except Exception as e:
         print('Error drop table psql schemas-01', e)
         return False
-def recovery_data_psql():
+def recovery_data_psql(quantity_line):
     try:
         db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
         operador_db = OperatorDatabase(db)
-        re = operador_db.get_all()
+        re = operador_db.get_by_qnt(quantity_line)
+        spliter=[]
+        for k in re:
+            spliter.append(k[0])
+        operador_db.get_by_split(spliter)
+
         print('Size Recovery dataset psql', len(re))
         return re
 
@@ -172,6 +177,12 @@ def quot_insert(times_mb,times_psql,lines_mb,lines_psql):
     }
     return quot
 
+
+def drop_metrics():
+    db = Database(os.environ.get('DATABASE_NAME'),os.environ.get('DATABASE_HOST'),os.environ.get('DATABASE_USER'),os.environ.get('DATABASE_PASSWORD'),os.environ.get('DATABASE_PORT'))
+    operador_db = OperatorDatabase(db)
+    return operador_db.drop_table_schemas_02()
+
 args = []
 for parameter in sys.argv[1:]:
     args.append(parameter)
@@ -179,9 +190,13 @@ for parameter in sys.argv[1:]:
 if args[0] == 'collect':
     print('collect size', len(get_all_metrics_collected()))
 
+    if args[1] == 'drop':
+        print("Drop Table Schema-2", drop_metrics())
+        
+
 if args[0] == 'plot':
     if args[1] == 'insert':
-        q = Generator.get_dataset(os.environ.get('HOME'),'metrics.csv')
+        q = Generator.get_dataset_insert_operation(os.environ.get('HOME'),'metrics.csv')
         mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
 
         data_set= q[1:]
@@ -218,9 +233,47 @@ if args[0] == 'plot':
         plt.title('Desempenho de Inserção')
         plt.savefig(os.environ.get('HOME')+"/metric_insert.pdf")
         plt.show()
-    elif args[2] == 'recovery':
-        pass
 
+    
+
+    elif args[1] == 'recovery':
+        q = Generator.get_dataset_recovery_operation(os.environ.get('HOME'),'metrics.csv')
+        mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
+
+        data_set = q
+        times_mb=[]
+        times_psql=[]
+        lines_mb =[]
+        lines_psql=[]
+
+        for i in data_set:
+            if i[0] == 'mongo':
+                times_mb.append(i[2])
+                lines_mb.append(i[4])
+            elif i[0] == 'psql':
+                times_psql.append(i[2])
+                lines_psql.append(i[4])
+        
+        quot = quot_insert(times_mb,times_psql,lines_mb,lines_psql)
+        df = mPandas.data_frame(quot)
+        
+        print(df)
+
+        time_and_mongo= [quot.get('times')[0],quot.get('lines')[0]]
+        time_and_psql = [quot.get('times')[1], quot.get('lines')[1]]
+
+        time_mong_x = time_and_mongo[0]
+        line_mongo_y = time_and_mongo[1]
+        
+        time_psql_x = time_and_psql[0]
+        line_psql_y = time_and_psql[1]
+
+        plt.bar( time_mong_x, line_mongo_y, label = 'MongoDB', color = 'r')
+        plt.bar( time_psql_x, line_psql_y , label = 'Postgres-SQL', color = 'b')
+        plt.legend()
+        plt.title('Desempenho de Leitura')
+        plt.savefig(os.environ.get('HOME')+"/metric_recovery.pdf")
+        plt.show()
 
 
 if args[0] == 'psql':
@@ -239,7 +292,7 @@ if args[0] == 'psql':
 if args[0] == "psql":
     if args[1] == 'recovery':
         time_cal_psql_init = timeit.default_timer()
-        re = recovery_data_psql()
+        re = recovery_data_psql(int(args[2]))
         time_cal_psql_fim = timeit.default_timer()
         metrics_time = time_insert_data(time_cal_psql_init,time_cal_psql_fim)
         obj_m = Metric(args[0],args[1],metrics_time[0],metrics_time[1],len(re))
