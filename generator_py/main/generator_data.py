@@ -10,6 +10,7 @@ from models.model import Metric
 from generator_arch.manipulatorfile import ManipulatorFile
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 import os
 import time
@@ -163,6 +164,13 @@ def insert_metrics(metric):
     return inserted
 
 
+def quot_insert(times_mb,times_psql,lines_mb,lines_psql):
+    quot = {
+        "SGBD":['mongo','psql'],
+        "times": [times_mb,times_psql],
+        "lines": [lines_mb,lines_psql] 
+    }
+    return quot
 
 args = []
 for parameter in sys.argv[1:]:
@@ -172,31 +180,48 @@ if args[0] == 'collect':
     print('collect size', len(get_all_metrics_collected()))
 
 if args[0] == 'plot':
-    mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
-    print(mPandas.header(Generator.get_len_type_csv(os.environ.get('HOME'),'metrics.csv')))
+    if args[1] == 'insert':
+        q = Generator.get_dataset(os.environ.get('HOME'),'metrics.csv')
+        mPandas = Pandas(os.environ.get('HOME'),'metrics.csv')
 
-    #mPandas.create_file('metrics.csv')
-    plt.rcdefaults()
-    fig,ax = plt.subplots()
+        data_set= q[1:]
+        times_mb=[]
+        times_psql=[]
+        lines_mb =[]
+        lines_psql=[]
 
-    sgbds = ('PSQL', 'MongoDB')
-    y_pos = np.arange(len(sgbds))
-    performance = 3 + 10 * np.random.rand(len(sgbds))
-    error = np.random.rand(len(sgbds))
+        for i in data_set:
+            if i[0] == 'mongo':
+                times_mb.append(i[2])
+                lines_mb.append(i[4])
+            elif i[0] == 'psql':
+                times_psql.append(i[2])
+                lines_psql.append(i[4])
+        
+        quot = quot_insert(times_mb,times_psql,lines_mb,lines_psql)
+        df = mPandas.data_frame(quot)
+        
+        print(df)
+        time_and_mongo= [quot.get('times')[0],quot.get('lines')[0]]
+        time_and_psql = [quot.get('times')[1], quot.get('lines')[1]]
 
-    
-    ax.barh(y_pos, performance, xerr=error, align='center')
-    ax.set_yticks(y_pos)
+        print(time_and_mongo)
+        print(time_and_psql)
 
-    ax.set_yticklabels(sgbds)
-    
-    ax.invert_yaxis()  # labels read top-to-bottom
-    ax.set_xlabel('Tempo de inserção')
-    ax.set_title('Desempenho PSQL X MONGODB')
+        # Definindo variáveis
+        time_mong_x= time_and_mongo[0]
+        line_mongo_y = time_and_mongo[1]
+        
+        time_psql_x = time_and_psql[0]
+        line_psql_y = time_and_psql[1]
 
-    plt.show()
-
-
+        
+        
+        plt.bar( time_mong_x, line_mongo_y, label = 'MongoDB', color = 'r')
+        plt.bar( time_psql_x, line_psql_y , label = 'Postgres-SQL', color = 'b')
+        plt.legend()
+        
+        plt.show()
 
 
 if args[0] == 'psql':
