@@ -8,8 +8,18 @@ class ManipulatorFile(object):
 
     def __init__(self,name_txt):
         self.name=name_txt
+    
+    def create(self):
+        sub = os.environ.get('HOME')
+        sub+="/"
+        sub += self.name
+        arch = open(sub,'w')
+        arch.close()
+
+
     @staticmethod
     def create_file(name):
+
         sub = os.environ.get('HOME')
         sub+="/"
         sub += name

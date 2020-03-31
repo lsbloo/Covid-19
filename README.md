@@ -61,3 +61,9 @@ For building and running the application you need:
   <br>
   
   ![Screenshot](insert_01.png 'Performace Inserção')
+  
+  <br>
+  <br>
+  <br>
+  
+  ![Screenshot](recovery_1.png 'Performace Leitura')
