@@ -65,4 +65,4 @@ For building and running the application you need:
   <br>
   <br>
   <br>
-  ![Screenshot](recovery_01.png 'Performace Leitura')
+  ![Screenshot](recovery_1.png 'Performace Leitura')
