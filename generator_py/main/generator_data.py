@@ -385,7 +385,7 @@ def show_menu():
     print("Insert Mongo DB or PSQL")
     print()
     print("python3 generate_data.py psql insert <number_lines>")
-    print("python3 generate_data.py psql mongo <number_lines>")
+    print("python3 generate_data.py mongo insert <number_lines>")
     print()
     print("Recovery")
     print()
