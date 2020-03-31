@@ -142,6 +142,7 @@ def insert_data_mongo(result_data_set,quantity_data_insert):
     try:
         if result_data_set != None:
             manipulator = ManipulatorFile('objects_mongo.txt')
+            manipulator.create()
             db = DatabaseM(os.environ.get('URL_MONGO_DB'))
             operador_db = OperatorDatabaseM(db,'covid19')
             if db.get_instance_collection() != None:
@@ -189,6 +190,9 @@ def main():
     for parameter in sys.argv[1:]:
         args.append(parameter)
 
+    if args[0] == '--help':
+        show_menu()
+    
     if args[0] == 'collect':
         print('collect size', len(get_all_metrics_collected()))
 
@@ -409,12 +413,12 @@ def show_menu():
 
 
 try:
-    show_menu()
-
     main()
-    
 except Exception as e:
     print('Error Input Param', e)
+    print('use: python3 generate_data.py --help')
+
+
 
         
 
