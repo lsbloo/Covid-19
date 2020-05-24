@@ -1,4 +1,4 @@
-## Covid-19
+## DBPerformace
    <p> 
        Ferramenta para análise de desempenho de banco de dados. 
    </p>
